@@ -139,16 +139,17 @@ async function runAgronomist(text: string): Promise<{ qaPairs: any[]; cost: numb
   `;
 
   try {
-    const response = await getOpenAI().chat.completions.create({
-      model,
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.2
+    const response = await getAI().models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: { temperature: 0.2 }
     });
 
-    const textContent = response.choices[0].message.content;
-    const qaPairs = JSON.parse(textContent || "[]");
+    const textContent = response.text || "[]";
+    const cleanJson = textContent.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim();
+    const qaPairs = JSON.parse(cleanJson);
 
-    return { qaPairs, cost: 0 }; // Local models have no API cost!
+    return { qaPairs, cost: 0.01 }; // Minimal API cost
   } catch (e) {
     console.error("Agronomist failed", e);
     return { qaPairs: [], cost: 0 };
@@ -169,16 +170,17 @@ async function runMarketAnalyst(text: string): Promise<{ analysis: any; cost: nu
   `;
 
   try {
-    const response = await getOpenAI().chat.completions.create({
-      model,
-      messages: [{ role: "user", content: prompt }],
-      temperature: 0.1
+    const response = await getAI().models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: prompt,
+      config: { temperature: 0.1 }
     });
 
-    const textContent = response.choices[0].message.content;
-    const analysis = JSON.parse(textContent || "{}");
+    const textContent = response.text || "{}";
+    const cleanJson = textContent.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim();
+    const analysis = JSON.parse(cleanJson);
 
-    return { analysis, cost: 0 };
+    return { analysis, cost: 0.01 };
   } catch (e) {
     console.error("Market Analyst failed", e);
     return { analysis: {}, cost: 0 };
@@ -440,7 +442,7 @@ async function startServer() {
       const { question } = req.body;
       if (!question) return res.status(400).json({ error: "Question is required" });
 
-      const model = "llama3:8b";
+      const model = "gemini-2.5-flash";
       const systemPrompt = `
         You are HarvestHub Assistant, an expert agricultural assistant and chatbot for the HarvestHub platform.
         Your goal is to help farmers with practical advice on crops, pests, soil, and weather.
@@ -449,23 +451,18 @@ async function startServer() {
         Keep answers concise (under 150 words) unless detailed steps are needed.
       `;
 
-      const response = await getOpenAI().chat.completions.create({
+      const response = await getAI().models.generateContent({
         model,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: question }
+        contents: [
+          { role: "user", parts: [{ text: `${systemPrompt}\n\nUser Question: ${question}` }] }
         ]
       });
 
-      const responseText = response.choices[0].message.content;
+      const responseText = response.text;
       res.json({ answer: responseText });
     } catch (e: any) {
       console.error("Ask Agronomist failed", e);
-      // Handle Ollama specific connection errors
-      if (e.code === 'ECONNREFUSED' || e.message?.includes('fetch failed')) {
-        return res.status(503).json({ error: "Local AI server (Ollama) is not running on port 11434. Please start Ollama." });
-      }
-      res.status(500).json({ error: "Failed to get answer from local model." });
+      res.status(500).json({ error: "Failed to get answer from cloud AI." });
     }
   });
 
@@ -586,14 +583,14 @@ Respond ONLY with a JSON object in this exact format, with no markdown tags or o
 "factors" should be an array of exactly 3 short strings explaining the price driver.
 "percentageReturn" should indicate the expected change in next 4 days (e.g., "+4.5% return" or "-2.1% return").`;
 
-      const response = await getOpenAI().chat.completions.create({
-        model: "llama3:8b",
-        messages: [{ role: "user", content: prompt }],
-        temperature: 0.3
+      const response = await getAI().models.generateContent({
+        model: "gemini-2.5-flash",
+        contents: prompt,
+        config: { temperature: 0.3 }
       });
 
-      const rawText = response.choices[0].message.content || "{}";
-      const cleanJson = rawText.replace(/```(?:json)?/gi, '').trim();
+      const rawText = response.text || "{}";
+      const cleanJson = rawText.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim();
 
       const parsed = JSON.parse(cleanJson);
 
