@@ -280,7 +280,7 @@ const products: Product[] = [
 
 async function startServer() {
   const app = express();
-  const PORT = 3000;
+  const PORT = Number(process.env.PORT) || 3000;
 
   // Middleware
   app.use(express.json());
@@ -910,6 +910,12 @@ Use simple, farmer-friendly language. Be specific with quantities (e.g., "10 ml 
       appType: "spa",
     });
     app.use(vite.middlewares);
+  } else {
+    // Serve static files in production
+    app.use(express.static(path.resolve("dist")));
+    app.get("*", (req, res) => {
+      res.sendFile(path.resolve("dist", "index.html"));
+    });
   }
 
   app.listen(PORT, "0.0.0.0", () => {
