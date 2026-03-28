@@ -1,0 +1,5 @@
+{
+  "name": "AgriEngage",
+  "description": "AI-powered agricultural data transformation platform. Ingests raw crop guides and market data to produce fine-tuned datasets.",
+  "requestFramePermissions": []
+}
