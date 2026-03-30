@@ -900,24 +900,31 @@ Use simple, farmer-friendly language. Be specific with quantities (e.g., "10 ml 
     }
   });
 
-  // Vite Middleware
-  if (process.env.NODE_ENV !== "production") {
+  // Vite Middleware (Skip if running on Vercel)
+  if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
     });
     app.use(vite.middlewares);
-  } else {
-    // Serve static files in production
+  } else if (!process.env.VERCEL) {
+    // Serve static files natively on explicit node server
     app.use(express.static(path.resolve("dist")));
     app.get("*", (req, res) => {
       res.sendFile(path.resolve("dist", "index.html"));
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
-  });
+  // Only start listening if not running as a Vercel Serverless Function
+  if (!process.env.VERCEL) {
+    app.listen(PORT, "0.0.0.0", () => {
+      console.log(`Server running on http://localhost:${PORT}`);
+    });
+  }
+  
+  return app;
 }
 
-startServer();
+// Export the initialized app promise for Vercel
+export const appPromise = startServer();
+export default appPromise;
