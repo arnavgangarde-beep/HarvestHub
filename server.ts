@@ -1,6 +1,5 @@
 import "dotenv/config";
 import express from "express";
-import { createServer as createViteServer } from "vite";
 import multer from "multer";
 import { GoogleGenAI } from "@google/genai";
 import OpenAI from "openai";
@@ -902,6 +901,7 @@ Use simple, farmer-friendly language. Be specific with quantities (e.g., "10 ml 
 
   // Vite Middleware (Skip if running on Vercel)
   if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
