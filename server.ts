@@ -81,27 +81,16 @@ let ai: GoogleGenAI;
 
 function getAI() {
   if (!ai) {
-    let apiKey = "";
-    const keysToCheck = ["GEMINI_API_KEY", "GOOGLE_API_KEY", "API_KEY", "VITE_GEMINI_API_KEY"];
+    let apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
 
-    console.log("[Server] Checking environment variables for API key...");
-
-    for (const keyName of keysToCheck) {
-      const value = process.env[keyName];
-      if (value) {
-        const cleanValue = value.trim().replace(/^["']|["']$/g, '');
-        if (cleanValue.length > 20 && cleanValue.startsWith("AIza")) {
-          apiKey = cleanValue;
-          console.log(`[Server] Found valid-looking API key in ${keyName}`);
-          break;
-        } else {
-          console.warn(`[Server] Ignoring invalid/placeholder key in ${keyName}: ${cleanValue.substring(0, 5)}...`);
-        }
-      }
+    // Fallback for Vercel deployments where env vars might not be configured yet
+    if (!apiKey || apiKey === "undefined") {
+      console.warn("[Server] Using fallback API Key - Please configure your Vercel Environment Variables");
+      apiKey = "AIzaSyB2dgSAQqJlRrRvpVsf23FvVGsZK4jMwUo";
     }
 
     if (!apiKey) {
-      console.error("[Server] No valid Google API key found in environment variables.");
+      console.error("[Server] No valid Google API key found.");
       throw new Error("GEMINI_API_KEY is not set or invalid");
     }
 
@@ -284,7 +273,7 @@ async function startServer() {
   const PORT = Number(process.env.PORT) || 3000;
 
   // Middleware
-  app.use(express.json());
+  app.use(express.json({ limit: '10mb' }));
 
   // File Upload
   const upload = multer({ storage: multer.memoryStorage() });
@@ -723,18 +712,27 @@ Respond ONLY with a raw JSON object (no markdown, no code blocks) in this exact 
     }
   });
   // --- Crop Disease Diagnosis ---
-  app.post("/api/crop-disease-diagnosis", upload.single("image"), async (req, res) => {
+  app.post("/api/crop-disease-diagnosis", async (req, res) => {
     try {
-      const file = req.file;
-      if (!file) {
-        res.status(400).json({ error: "No image uploaded." });
+      const { 
+        image, 
+        cropType, growthStage, affectedParts, symptomDuration, spreadPattern, weather, irrigation, soilType, recentFertilizer, recentPesticide 
+      } = req.body;
+
+      if (!image || typeof image !== 'string') {
+        res.status(400).json({ error: "No image provided or invalid format." });
         return;
       }
 
-      const { cropType, growthStage, affectedParts, symptomDuration, spreadPattern, weather, irrigation, soilType, recentFertilizer, recentPesticide } = req.body;
+      // Convert data URL (data:image/jpeg;base64,....) to base64
+      const matches = image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+      let mimeType = "image/jpeg";
+      let imageBase64 = image;
 
-      const imageBase64 = file.buffer.toString("base64");
-      const mimeType = file.mimetype || "image/jpeg";
+      if (matches && matches.length === 3) {
+        mimeType = matches[1];
+        imageBase64 = matches[2];
+      }
 
       const prompt = `You are an expert agricultural pathologist. A farmer has uploaded an image of a diseased crop. Analyze both the visual symptoms in the image and the following field parameters:
 

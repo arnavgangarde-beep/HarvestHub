@@ -1509,26 +1509,46 @@ function CropDiseaseDiagnosis() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!imageFile) return;
+    if (!imageFile || !imagePreview) return;
     setPhase("loading");
     setErrorMsg("");
 
     try {
-      const formData = new FormData();
-      formData.append("image", imageFile);
-      Object.entries(params).forEach(([k, v]) => formData.append(k, v));
+      const payload = {
+        image: imagePreview,
+        ...params
+      };
 
-      const res = await fetch("/api/crop-disease-diagnosis", { method: "POST", body: formData });
+      const res = await fetch("/api/crop-disease-diagnosis", { 
+        method: "POST", 
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload) 
+      });
+      
+      if (!res.ok) {
+        let errorText = "Analysis failed. Please try again.";
+        try {
+          const data = await res.json();
+          errorText = data.error || errorText;
+        } catch (e) {
+          // If the server returns HTML (e.g., 504 Gateway Timeout or 500 error)
+          errorText = `Server error (${res.status}). Please try again later.`;
+        }
+        setErrorMsg(errorText);
+        setPhase("error");
+        return;
+      }
+
       const data = await res.json();
-
-      if (res.ok && data.diseaseName) {
+      if (data && data.diseaseName) {
         setResult(data);
         setPhase("success");
       } else {
-        setErrorMsg(data.error || "Analysis failed. Please try again.");
+        setErrorMsg(data.error || "Invalid response format. Please try again.");
         setPhase("error");
       }
-    } catch {
+    } catch (e) {
+      console.error(e);
       setErrorMsg("Network error. Make sure the server is running.");
       setPhase("error");
     }
