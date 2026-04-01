@@ -6,9 +6,7 @@ import OpenAI from "openai";
 import { z } from "zod";
 import fs from "fs";
 import path from "path";
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
-const pdf = require("pdf-parse");
+// Lazy-load pdf-parse when needed to avoid Vercel Serverless startup crashes
 import { v4 as uuidv4 } from "uuid";
 
 // --- Types & Schemas (Blueprints) ---
@@ -356,7 +354,9 @@ async function startServer() {
       if (req.file) {
         fileName = req.file.originalname;
         if (req.file.mimetype === "application/pdf") {
-          const pdfData = await pdf(req.file.buffer);
+          const m = await import("pdf-parse");
+          const pdfParse = (m as any).default || m;
+          const pdfData = await pdfParse(req.file.buffer);
           content = pdfData.text;
         } else {
           content = req.file.buffer.toString("utf-8");
