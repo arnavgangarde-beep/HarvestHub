@@ -354,7 +354,8 @@ async function startServer() {
       if (req.file) {
         fileName = req.file.originalname;
         if (req.file.mimetype === "application/pdf") {
-          const m = await import("pdf-parse");
+          const pdfPkg = "pdf-parse";
+          const m = await import(pdfPkg);
           const pdfParse = (m as any).default || m;
           const pdfData = await pdfParse(req.file.buffer);
           content = pdfData.text;
@@ -899,7 +900,9 @@ Use simple, farmer-friendly language. Be specific with quantities (e.g., "10 ml 
 
   // Vite Middleware (Skip if running on Vercel)
   if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
-    const { createServer: createViteServer } = await import("vite");
+    // Hide 'vite' from Vercel's Static Analysis (nft) to prevent bundling its native binaries
+    const vitePkg = "vite";
+    const { createServer: createViteServer } = await import(vitePkg);
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
