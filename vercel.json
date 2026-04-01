@@ -2,6 +2,18 @@
   "version": 2,
   "rewrites": [
     {
+      "source": "/api/crop-disease-diagnosis",
+      "destination": "/api/crop-disease-diagnosis.ts"
+    },
+    {
+      "source": "/api/predict-price",
+      "destination": "/api/predict-price.ts"
+    },
+    {
+      "source": "/api/crop-recommend",
+      "destination": "/api/crop-recommend.ts"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/index.ts"
     }
