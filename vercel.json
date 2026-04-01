@@ -14,6 +14,10 @@
       "destination": "/api/crop-recommend.ts"
     },
     {
+      "source": "/api/ask",
+      "destination": "/api/ask.ts"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/index.ts"
     }
