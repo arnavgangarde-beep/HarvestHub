@@ -7,7 +7,7 @@ export default async function handler(req: any, res: any) {
     const { crop, mandi, quantity } = req.body;
     let apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
     if (!apiKey || apiKey === "undefined") {
-      apiKey = "AIzaSyB2dgSAQqJlRrRvpVsf23FvVGsZK4jMwUo";
+      apiKey = "AIzaSyDSrnGpDYKjHICd5xLEkuWayxAWAUHx8Os";
     }
 
     const ai = new GoogleGenAI({ apiKey });
@@ -28,7 +28,7 @@ Respond ONLY with a JSON object in this exact format, with no markdown tags or o
 "percentageReturn" should indicate the expected change in next 4 days.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3-flash-preview",
       contents: prompt,
       config: { temperature: 0.3 }
     });

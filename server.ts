@@ -84,7 +84,7 @@ function getAI() {
     // Fallback for Vercel deployments where env vars might not be configured yet
     if (!apiKey || apiKey === "undefined") {
       console.warn("[Server] Using fallback API Key - Please configure your Vercel Environment Variables");
-      apiKey = "AIzaSyB2dgSAQqJlRrRvpVsf23FvVGsZK4jMwUo";
+      apiKey = "AIzaSyDSrnGpDYKjHICd5xLEkuWayxAWAUHx8Os";
     }
 
     if (!apiKey) {
@@ -126,7 +126,7 @@ async function runAgronomist(text: string): Promise<{ qaPairs: any[]; cost: numb
 
   try {
     const response = await getAI().models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3-flash-preview",
       contents: prompt,
       config: { temperature: 0.2 }
     });
@@ -157,7 +157,7 @@ async function runMarketAnalyst(text: string): Promise<{ analysis: any; cost: nu
 
   try {
     const response = await getAI().models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-1.5-flash",
       contents: prompt,
       config: { temperature: 0.1 }
     });
@@ -431,7 +431,7 @@ async function startServer() {
       const { question } = req.body;
       if (!question) return res.status(400).json({ error: "Question is required" });
 
-      const model = "gemini-2.5-flash";
+      const model = "gemini-3-flash-preview";
       const systemPrompt = `
         You are HarvestHub Assistant, an expert agricultural assistant and chatbot for the HarvestHub platform.
         Your goal is to help farmers with practical advice on crops, pests, soil, and weather.
@@ -450,8 +450,8 @@ async function startServer() {
       const responseText = response.text;
       res.json({ answer: responseText });
     } catch (e: any) {
-      console.error("Ask Agronomist failed", e);
-      res.status(500).json({ error: "Failed to get answer from cloud AI." });
+      console.error("Ask Agronomist failed:", e.message || e);
+      res.status(500).json({ error: e.message || "Failed to get answer from cloud AI." });
     }
   });
 
@@ -461,7 +461,7 @@ async function startServer() {
       const { location, query } = req.body;
 
       // Use gemini-2.5-flash for Maps Grounding as per guidelines
-      const model = "gemini-2.5-flash";
+      const model = "gemini-1.5-flash";
       const prompt = `Find agricultural stores, suppliers, or markets in or near ${location} that sell ${query || "farming supplies"}. Provide a helpful summary and list the specific places found.`;
 
       const response = await getAI().models.generateContent({
@@ -573,7 +573,7 @@ Respond ONLY with a JSON object in this exact format, with no markdown tags or o
 "percentageReturn" should indicate the expected change in next 4 days (e.g., "+4.5% return" or "-2.1% return").`;
 
       const response = await getAI().models.generateContent({
-        model: "gemini-2.5-flash",
+        model: "gemini-3-flash-preview",
         contents: prompt,
         config: { temperature: 0.3 }
       });
@@ -649,7 +649,7 @@ Respond ONLY with a raw JSON object (no markdown, no code blocks) in this exact 
 
       try {
         const response = await getAI().models.generateContent({
-          model: "gemini-2.5-flash",
+          model: "gemini-1.5-flash",
           contents: prompt,
           config: { temperature: 0.3 }
         });
@@ -773,7 +773,7 @@ Use simple, farmer-friendly language. Be specific with quantities (e.g., "10 ml 
 
       try {
         const response = await getAI().models.generateContent({
-          model: "gemini-2.5-flash",
+          model: "gemini-3-flash-preview",
           contents: [
             {
               role: "user",

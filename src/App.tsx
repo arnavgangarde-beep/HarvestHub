@@ -2573,9 +2573,13 @@ function KisanChatbot() {
         body: JSON.stringify({ question: userMsg })
       });
       const data = await res.json();
-      setMessages(prev => [...prev, { role: 'bot', text: data.answer }]);
-    } catch (err) {
-      setMessages(prev => [...prev, { role: 'bot', text: "Sorry, I am having trouble connecting right now." }]);
+      if (data.error) {
+        setMessages(prev => [...prev, { role: 'bot', text: `Sorry, there was an error: ${data.error}. It might be an API key issue.` }]);
+      } else {
+        setMessages(prev => [...prev, { role: 'bot', text: data.answer }]);
+      }
+    } catch (err: any) {
+      setMessages(prev => [...prev, { role: 'bot', text: "Sorry, I am having trouble connecting to the server. Please check your network." }]);
     } finally {
       setLoading(false);
     }

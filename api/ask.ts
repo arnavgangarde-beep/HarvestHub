@@ -9,11 +9,11 @@ export default async function handler(req: any, res: any) {
 
     let apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
     if (!apiKey || apiKey === "undefined") {
-      apiKey = "AIzaSyB2dgSAQqJlRrRvpVsf23FvVGsZK4jMwUo";
+      apiKey = "AIzaSyDSrnGpDYKjHICd5xLEkuWayxAWAUHx8Os";
     }
 
     const ai = new GoogleGenAI({ apiKey });
-    const model = "gemini-2.5-flash";
+    const model = "gemini-3-flash-preview";
     const systemPrompt = `
       You are HarvestHub Assistant, an expert agricultural assistant and chatbot for the HarvestHub platform.
       Your goal is to help farmers with practical advice on crops, pests, soil, and weather.

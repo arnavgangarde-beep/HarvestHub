@@ -30,7 +30,7 @@ export default async function handler(req: any, res: any) {
 
     // Fallback for Vercel deployments
     if (!apiKey || apiKey === "undefined") {
-      apiKey = "AIzaSyB2dgSAQqJlRrRvpVsf23FvVGsZK4jMwUo";
+      apiKey = "AIzaSyDSrnGpDYKjHICd5xLEkuWayxAWAUHx8Os";
     }
 
     const ai = new GoogleGenAI({ apiKey });
@@ -72,7 +72,7 @@ Respond ONLY with a raw JSON object (no markdown, no code blocks) in this exact 
 Use simple, farmer-friendly language. Be specific with quantities.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3-flash-preview",
       contents: [
         {
           role: "user",

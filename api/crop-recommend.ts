@@ -7,7 +7,7 @@ export default async function handler(req: any, res: any) {
     const { temperature, humidity, rainfall, ph, locationName } = req.body;
     let apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
     if (!apiKey || apiKey === "undefined") {
-      apiKey = "AIzaSyB2dgSAQqJlRrRvpVsf23FvVGsZK4jMwUo";
+      apiKey = "AIzaSyDSrnGpDYKjHICd5xLEkuWayxAWAUHx8Os";
     }
 
     const ai = new GoogleGenAI({ apiKey });
@@ -36,7 +36,7 @@ Respond ONLY with a raw JSON object (no markdown, no code blocks) in this exact 
 "partiallySuitable" should contain exactly 5 other crops sorted by score descending. Scores for partial crops should be between 40-85.`;
 
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash",
+      model: "gemini-3-flash-preview",
       contents: prompt,
       config: { temperature: 0.3 }
     });
