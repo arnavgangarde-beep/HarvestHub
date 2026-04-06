@@ -2,6 +2,10 @@
   "version": 2,
   "rewrites": [
     {
+      "source": "/api/test-ai",
+      "destination": "/api/test-ai.ts"
+    },
+    {
       "source": "/api/crop-disease-diagnosis",
       "destination": "/api/crop-disease-diagnosis.ts"
     },
