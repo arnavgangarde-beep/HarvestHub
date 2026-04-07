@@ -1,7 +1,5 @@
-import { GoogleGenAI } from "@google/genai";
-
 export default async function handler(req: any, res: any) {
-  const apiKey = process.env.GEMINI_API_KEY || "AIzaSyDSrnGpDYKjHICd5xLEkuWayxAWAUHx8Os";
+  const apiKey = process.env.GEMINI_API_KEY || "AIzaSyB_Ntdebpox7zFHVCMF13snlpKifRXJEy0";
   const model = "gemini-2.5-flash";
 
   const result: any = {
@@ -10,21 +8,35 @@ export default async function handler(req: any, res: any) {
     model,
     envKeyPresent: !!process.env.GEMINI_API_KEY,
     nodeVersion: process.version,
+    sdkUsed: "fetch (no SDK)",
   };
 
   try {
-    const ai = new GoogleGenAI({ apiKey });
-    const response = await ai.models.generateContent({
-      model,
-      contents: "Say hello in one word."
-    });
-    result.status = "SUCCESS";
-    result.response = response.text;
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: "Say hello in one word." }] }]
+        })
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      result.status = "FAILED";
+      result.httpStatus = response.status;
+      result.error = data?.error?.message;
+      result.raw = data;
+    } else {
+      result.status = "SUCCESS";
+      result.response = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    }
   } catch (e: any) {
-    result.status = "FAILED";
+    result.status = "CRASHED";
     result.error = e?.message;
-    result.errorStatus = e?.status;
-    result.errorDetails = JSON.stringify(e);
   }
 
   return res.json(result);

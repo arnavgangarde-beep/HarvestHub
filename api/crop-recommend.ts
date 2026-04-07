@@ -1,16 +1,11 @@
-import { GoogleGenAI } from "@google/genai";
-
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: "Method not allowed" });
 
+  const apiKey = process.env.GEMINI_API_KEY || "AIzaSyB_Ntdebpox7zFHVCMF13snlpKifRXJEy0";
+  const model = "gemini-2.5-flash";
+
   try {
     const { temperature, humidity, rainfall, ph, locationName } = req.body;
-    let apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
-    if (!apiKey || apiKey === "undefined") {
-      apiKey = "AIzaSyDSrnGpDYKjHICd5xLEkuWayxAWAUHx8Os";
-    }
-
-    const ai = new GoogleGenAI({ apiKey });
 
     const prompt = `You are an expert agricultural AI. Given these real-time conditions for the location "${locationName || "India"}":
 - Temperature: ${temperature}°C
@@ -35,13 +30,22 @@ Respond ONLY with a raw JSON object (no markdown, no code blocks) in this exact 
 
 "partiallySuitable" should contain exactly 5 other crops sorted by score descending. Scores for partial crops should be between 40-85.`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: prompt,
-      config: { temperature: 0.3 }
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.3 }
+        })
+      }
+    );
 
-    const rawText = response.text || "{}";
+    const data = await response.json();
+    if (!response.ok) throw new Error(data?.error?.message || "Gemini API error");
+
+    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
     const cleanJson = rawText.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(cleanJson);
 
@@ -49,25 +53,19 @@ Respond ONLY with a raw JSON object (no markdown, no code blocks) in this exact 
       topCrop: parsed.topCrop || "Pulses",
       score: parsed.score || 92,
       partiallySuitable: parsed.partiallySuitable || [
-        { name: "Wheat", score: 78 },
-        { name: "Rice", score: 72 },
-        { name: "Cotton", score: 65 },
-        { name: "Maize", score: 58 },
+        { name: "Wheat", score: 78 }, { name: "Rice", score: 72 },
+        { name: "Cotton", score: 65 }, { name: "Maize", score: 58 },
         { name: "Soybean", score: 52 }
       ]
     });
 
   } catch (e: any) {
-    console.error("Vercel AI crop-recommend error:", e);
-    // Fallback logic
+    console.error("crop-recommend error:", e);
     return res.json({
-      topCrop: "Pulses",
-      score: 86,
+      topCrop: "Pulses", score: 86,
       partiallySuitable: [
-        { name: "Wheat", score: 78 },
-        { name: "Rice", score: 72 },
-        { name: "Cotton", score: 65 },
-        { name: "Sugarcane", score: 60 },
+        { name: "Wheat", score: 78 }, { name: "Rice", score: 72 },
+        { name: "Cotton", score: 65 }, { name: "Sugarcane", score: 60 },
         { name: "Maize", score: 55 }
       ]
     });

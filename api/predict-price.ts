@@ -1,16 +1,11 @@
-import { GoogleGenAI } from "@google/genai";
-
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: "Method not allowed" });
 
+  const apiKey = process.env.GEMINI_API_KEY || "AIzaSyB_Ntdebpox7zFHVCMF13snlpKifRXJEy0";
+  const model = "gemini-2.5-flash";
+
   try {
     const { crop, mandi, quantity } = req.body;
-    let apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
-    if (!apiKey || apiKey === "undefined") {
-      apiKey = "AIzaSyDSrnGpDYKjHICd5xLEkuWayxAWAUHx8Os";
-    }
-
-    const ai = new GoogleGenAI({ apiKey });
 
     const prompt = `You are an expert agricultural AI. Predict the price per quintal (100 KG) for the crop "${crop || "unknown"}" in the market "${mandi || "unknown"}".
 Take into account historical trends, seasonal supply, and regional variations.
@@ -27,13 +22,22 @@ Respond ONLY with a JSON object in this exact format, with no markdown tags or o
 "factors" should be an array of exactly 3 short strings explaining the price driver.
 "percentageReturn" should indicate the expected change in next 4 days.`;
 
-    const response = await ai.models.generateContent({
-      model: "gemini-3-flash-preview",
-      contents: prompt,
-      config: { temperature: 0.3 }
-    });
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ role: "user", parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.3 }
+        })
+      }
+    );
 
-    const rawText = response.text || "{}";
+    const data = await response.json();
+    if (!response.ok) throw new Error(data?.error?.message || "Gemini API error");
+
+    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
     const cleanJson = rawText.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(cleanJson);
 
@@ -48,13 +52,13 @@ Respond ONLY with a JSON object in this exact format, with no markdown tags or o
       currentRevenue: Math.round(currentRevenue),
       predictedRevenue: Math.round(predictedRevenue),
       confidence: parsed.confidence || 78,
-      factors: parsed.factors?.slice(0, 3) || [`Historical baseline`, `Regional variations`, "Stable seasonal supply patterns"],
+      factors: parsed.factors?.slice(0, 3) || ["Historical baseline", "Regional variations", "Seasonal supply"],
       percentageReturn: parsed.percentageReturn || `${returnPercent > 0 ? '+' : ''}${returnPercent}% return`
     });
 
   } catch (e: any) {
-    console.error("Vercel AI predict-price error:", e);
-    const qtyKg = Number(req.body.quantity) || 1000;
+    console.error("predict-price error:", e);
+    const qtyKg = Number(req.body?.quantity) || 1000;
     return res.json({
       currentRevenue: (2200 / 100) * qtyKg,
       predictedRevenue: ((2200 * 0.95) / 100) * qtyKg,
