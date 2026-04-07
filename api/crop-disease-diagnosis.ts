@@ -3,9 +3,8 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY is not configured on the server." });
-  const model = "gemini-1.5-flash";
+  const apiKey = process.env.OPENROUTER_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: "OPENROUTER_API_KEY is not configured on the server." });
 
   try {
     const {
@@ -17,13 +16,8 @@ export default async function handler(req: any, res: any) {
       return res.status(400).json({ error: "No image provided or invalid format." });
     }
 
-    const matches = image.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
-    let mimeType = "image/jpeg";
-    let imageBase64 = image;
-    if (matches && matches.length === 3) {
-      mimeType = matches[1];
-      imageBase64 = matches[2];
-    }
+    // Ensure the image is a proper data URL for OpenRouter
+    const imageUrl = image.startsWith("data:") ? image : `data:image/jpeg;base64,${image}`;
 
     const prompt = `You are an expert agricultural pathologist. A farmer has uploaded an image of a diseased crop. Analyze both the visual symptoms in the image and the following field parameters:
 
@@ -61,28 +55,39 @@ Respond ONLY with a raw JSON object (no markdown, no code blocks) in this exact 
 
 Use simple, farmer-friendly language. Be specific with quantities.`;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+        "HTTP-Referer": "https://harvest-hub-green.vercel.app",
+        "X-Title": "HarvestHub Disease Diagnosis"
+      },
+      body: JSON.stringify({
+        model: "meta-llama/llama-4-scout:free",
+        messages: [
+          {
             role: "user",
-            parts: [
-              { inlineData: { mimeType, data: imageBase64 } },
-              { text: prompt }
+            content: [
+              {
+                type: "image_url",
+                image_url: { url: imageUrl }
+              },
+              {
+                type: "text",
+                text: prompt
+              }
             ]
-          }],
-          generationConfig: { temperature: 0.3 }
-        })
-      }
-    );
+          }
+        ],
+        temperature: 0.3
+      })
+    });
 
     const data = await response.json();
-    if (!response.ok) throw new Error(data?.error?.message || "Gemini API error");
+    if (!response.ok) throw new Error(data?.error?.message || "OpenRouter API error");
 
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+    const rawText = data?.choices?.[0]?.message?.content || "{}";
     const cleanJson = rawText.replace(/```(?:json)?/gi, "").replace(/```/g, "").trim();
     const parsed = JSON.parse(cleanJson);
 
