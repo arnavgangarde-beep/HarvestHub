@@ -64,7 +64,7 @@ Use simple, farmer-friendly language. Be specific with quantities.`;
         "X-Title": "HarvestHub Disease Diagnosis"
       },
       body: JSON.stringify({
-        model: "google/gemini-2.0-flash-exp:free",
+        model: "qwen/qwen3.6-plus:free",
         messages: [
           {
             role: "user",
