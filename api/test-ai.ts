@@ -1,6 +1,6 @@
 export default async function handler(req: any, res: any) {
   const apiKey = process.env.GEMINI_API_KEY || "";
-  const model = "gemini-1.5-flash";
+  const model = "gemini-2.0-flash";
 
   const result: any = {
     timestamp: new Date().toISOString(),
