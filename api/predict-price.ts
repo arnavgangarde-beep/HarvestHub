@@ -1,9 +1,8 @@
 export default async function handler(req: any, res: any) {
   if (req.method !== 'POST') return res.status(405).json({ error: "Method not allowed" });
 
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: "GEMINI_API_KEY is not configured on the server." });
-  const model = "gemini-1.5-flash";
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: "GROQ_API_KEY is not configured on the server." });
 
   try {
     const { crop, mandi, quantity } = req.body;
@@ -23,22 +22,23 @@ Respond ONLY with a JSON object in this exact format, with no markdown tags or o
 "factors" should be an array of exactly 3 short strings explaining the price driver.
 "percentageReturn" should indicate the expected change in next 4 days.`;
 
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ role: "user", parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.3 }
-        })
-      }
-    );
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "llama-3.3-70b-versatile",
+        messages: [{ role: "user", content: prompt }],
+        temperature: 0.3
+      })
+    });
 
     const data = await response.json();
-    if (!response.ok) throw new Error(data?.error?.message || "Gemini API error");
+    if (!response.ok) throw new Error(data?.error?.message || "Groq API error");
 
-    const rawText = data?.candidates?.[0]?.content?.parts?.[0]?.text || "{}";
+    const rawText = data?.choices?.[0]?.message?.content || "{}";
     const cleanJson = rawText.replace(/```(?:json)?/gi, '').replace(/```/g, '').trim();
     const parsed = JSON.parse(cleanJson);
 
