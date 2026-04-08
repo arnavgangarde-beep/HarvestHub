@@ -3,8 +3,8 @@ export default async function handler(req: any, res: any) {
     return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const apiKey = process.env.OPENROUTER_API_KEY;
-  if (!apiKey) return res.status(500).json({ error: "OPENROUTER_API_KEY is not configured on the server." });
+  const apiKey = process.env.GROQ_API_KEY;
+  if (!apiKey) return res.status(500).json({ error: "GROQ_API_KEY is not configured on the server." });
 
   try {
     const {
@@ -16,7 +16,7 @@ export default async function handler(req: any, res: any) {
       return res.status(400).json({ error: "No image provided or invalid format." });
     }
 
-    // Ensure the image is a proper data URL for OpenRouter
+    // Ensure proper data URL format for Groq vision
     const imageUrl = image.startsWith("data:") ? image : `data:image/jpeg;base64,${image}`;
 
     const prompt = `You are an expert agricultural pathologist. A farmer has uploaded an image of a diseased crop. Analyze both the visual symptoms in the image and the following field parameters:
@@ -55,16 +55,14 @@ Respond ONLY with a raw JSON object (no markdown, no code blocks) in this exact 
 
 Use simple, farmer-friendly language. Be specific with quantities.`;
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
-        "HTTP-Referer": "https://harvest-hub-green.vercel.app",
-        "X-Title": "HarvestHub Disease Diagnosis"
+        "Authorization": `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: "qwen/qwen3.6-plus:free",
+        model: "meta-llama/llama-4-scout-17b-16e-instruct",
         messages: [
           {
             role: "user",
@@ -85,7 +83,7 @@ Use simple, farmer-friendly language. Be specific with quantities.`;
     });
 
     const data = await response.json();
-    if (!response.ok) throw new Error(data?.error?.message || "OpenRouter API error");
+    if (!response.ok) throw new Error(data?.error?.message || "Groq API error");
 
     const rawText = data?.choices?.[0]?.message?.content || "{}";
     const cleanJson = rawText.replace(/```(?:json)?/gi, "").replace(/```/g, "").trim();
