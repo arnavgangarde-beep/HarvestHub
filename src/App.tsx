@@ -2228,37 +2228,266 @@ function SellerDashboard({ user, onLogout }: { user: UserType, onLogout: () => v
 
         <div className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
           {activeTab === "dashboard" && (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-[#0F172A] p-6 rounded-xl border border-slate-800/50 shadow-sm flex items-center gap-4">
-                  <div className="w-12 h-12 bg-[#F59E0B]/10 text-[#F59E0B] rounded-full flex items-center justify-center border border-[#F59E0B]/20">
-                    <Package className="w-6 h-6" />
+            <div className="space-y-6 pb-8">
+
+              {/* Quick Actions Header */}
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <h1 className="text-2xl font-bold text-white tracking-tight">Welcome back, {user.name} 👋</h1>
+                  <p className="text-slate-400 text-sm mt-1">Here's what's happening with your farm today.</p>
+                </div>
+                <div className="flex items-center gap-3 flex-shrink-0">
+                  <button
+                    onClick={() => setActiveTab("marketplace")}
+                    className="flex items-center gap-2 px-4 py-2.5 bg-[#F2994A] hover:bg-[#e8893a] text-[#111827] font-bold rounded-xl transition-all shadow-lg shadow-[#F2994A]/20 text-sm"
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add New Product
+                  </button>
+                  <button className="flex items-center gap-2 px-4 py-2.5 bg-[#0F172A] hover:bg-slate-800 border border-slate-700 text-slate-300 hover:text-white font-medium rounded-xl transition-all text-sm">
+                    <TrendingUp className="w-4 h-4" />
+                    Download Report
+                  </button>
+                </div>
+              </div>
+
+              {/* KPI Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+                {/* Card 1: Products Sold */}
+                <div className="relative bg-[#0F172A]/80 backdrop-blur-sm p-5 rounded-2xl border border-slate-800/60 shadow-xl overflow-hidden group hover:border-[#F2994A]/30 transition-all duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#F2994A]/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-11 h-11 bg-[#F2994A]/10 rounded-xl flex items-center justify-center border border-[#F2994A]/20">
+                      <Package className="w-5 h-5 text-[#F2994A]" />
+                    </div>
+                    <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5H7z"/></svg>
+                      +12%
+                    </span>
                   </div>
-                  <div>
-                    <p className="text-sm text-slate-400 font-medium">Total Products Sold</p>
-                    <h3 className="text-2xl font-bold text-white">1,248</h3>
+                  <p className="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">Total Products Sold</p>
+                  <h3 className="text-3xl font-black text-white">1,248</h3>
+                  <p className="text-slate-500 text-xs mt-2">vs last month</p>
+                </div>
+
+                {/* Card 2: Total Revenue */}
+                <div className="relative bg-[#0F172A]/80 backdrop-blur-sm p-5 rounded-2xl border border-slate-800/60 shadow-xl overflow-hidden group hover:border-blue-500/30 transition-all duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-11 h-11 bg-blue-500/10 rounded-xl flex items-center justify-center border border-blue-500/20">
+                      <IndianRupee className="w-5 h-5 text-blue-400" />
+                    </div>
+                    <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5H7z"/></svg>
+                      +8.3%
+                    </span>
+                  </div>
+                  <p className="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">Total Revenue</p>
+                  <h3 className="text-3xl font-black text-white">₹45,200</h3>
+                  <p className="text-slate-500 text-xs mt-2">vs last month</p>
+                </div>
+
+                {/* Card 3: Avg Order Value */}
+                <div className="relative bg-[#0F172A]/80 backdrop-blur-sm p-5 rounded-2xl border border-slate-800/60 shadow-xl overflow-hidden group hover:border-purple-500/30 transition-all duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-11 h-11 bg-purple-500/10 rounded-xl flex items-center justify-center border border-purple-500/20">
+                      <TrendingUp className="w-5 h-5 text-purple-400" />
+                    </div>
+                    <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">
+                      <svg className="w-2.5 h-2.5 rotate-180" fill="currentColor" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5H7z"/></svg>
+                      -2%
+                    </span>
+                  </div>
+                  <p className="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">Avg. Order Value</p>
+                  <h3 className="text-3xl font-black text-white">₹3,200</h3>
+                  <p className="text-slate-500 text-xs mt-2">vs last month</p>
+                </div>
+
+                {/* Card 4: Active Listings */}
+                <div className="relative bg-[#0F172A]/80 backdrop-blur-sm p-5 rounded-2xl border border-slate-800/60 shadow-xl overflow-hidden group hover:border-emerald-500/30 transition-all duration-300">
+                  <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="w-11 h-11 bg-emerald-500/10 rounded-xl flex items-center justify-center border border-emerald-500/20">
+                      <Store className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <span className="flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                      <svg className="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 14l5-5 5 5H7z"/></svg>
+                      +5%
+                    </span>
+                  </div>
+                  <p className="text-slate-400 text-xs font-medium uppercase tracking-wider mb-1">Active Listings</p>
+                  <h3 className="text-3xl font-black text-white">84</h3>
+                  <p className="text-slate-500 text-xs mt-2">vs last month</p>
+                </div>
+              </div>
+
+              {/* Main Content: Chart + AI Insights */}
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
+
+                {/* Sales Overview Chart (2/3 width) */}
+                <div className="lg:col-span-2 bg-[#0F172A]/80 backdrop-blur-sm rounded-2xl border border-slate-800/60 shadow-xl p-6">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h3 className="text-base font-bold text-white">Sales Overview</h3>
+                      <p className="text-slate-500 text-xs mt-0.5">Last 30 days revenue trend</p>
+                    </div>
+                    <span className="text-xs font-bold px-3 py-1.5 rounded-full bg-[#F2994A]/10 text-[#F2994A] border border-[#F2994A]/20">↑ Growing</span>
+                  </div>
+                  {/* SVG Line Chart */}
+                  <div className="relative h-48 w-full">
+                    <svg viewBox="0 0 600 160" className="w-full h-full" preserveAspectRatio="none">
+                      {/* Grid lines */}
+                      {[0,40,80,120,160].map(y => (
+                        <line key={y} x1="0" y1={y} x2="600" y2={y} stroke="#1e293b" strokeWidth="1" />
+                      ))}
+                      {/* Gradient fill */}
+                      <defs>
+                        <linearGradient id="salesGrad" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#F2994A" stopOpacity="0.3"/>
+                          <stop offset="100%" stopColor="#F2994A" stopOpacity="0"/>
+                        </linearGradient>
+                      </defs>
+                      {/* Area fill */}
+                      <path
+                        d="M0,140 C30,130 60,120 90,110 C120,100 150,105 180,90 C210,75 240,80 270,65 C300,50 330,55 360,40 C390,25 420,35 450,20 C480,10 510,15 540,8 C560,5 580,4 600,2 L600,160 L0,160 Z"
+                        fill="url(#salesGrad)"
+                      />
+                      {/* Line */}
+                      <path
+                        d="M0,140 C30,130 60,120 90,110 C120,100 150,105 180,90 C210,75 240,80 270,65 C300,50 330,55 360,40 C390,25 420,35 450,20 C480,10 510,15 540,8 C560,5 580,4 600,2"
+                        fill="none" stroke="#F2994A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"
+                      />
+                      {/* Data points */}
+                      {[[0,140],[90,110],[180,90],[270,65],[360,40],[450,20],[540,8],[600,2]].map(([x,y],i) => (
+                        <circle key={i} cx={x} cy={y} r="3.5" fill="#F2994A" stroke="#0F172A" strokeWidth="2"/>
+                      ))}
+                    </svg>
+                    {/* Y-axis labels */}
+                    <div className="absolute left-0 top-0 h-full flex flex-col justify-between text-[10px] text-slate-500 pointer-events-none -translate-x-6">
+                      <span>₹50k</span><span>₹37k</span><span>₹25k</span><span>₹12k</span><span>₹0</span>
+                    </div>
+                  </div>
+                  {/* X-axis labels */}
+                  <div className="flex justify-between text-[10px] text-slate-500 mt-2 px-1">
+                    {["Mar 8","Mar 11","Mar 14","Mar 17","Mar 20","Mar 23","Mar 26","Mar 29","Apr 7"].map(d => (
+                      <span key={d}>{d}</span>
+                    ))}
                   </div>
                 </div>
-                <div className="bg-[#0F172A] p-6 rounded-xl border border-slate-800/50 shadow-sm flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-500/10 text-blue-400 rounded-full flex items-center justify-center border border-blue-500/20">
-                    <IndianRupee className="w-6 h-6" />
+
+                {/* AI Market Insights (1/3 width) */}
+                <div className="bg-gradient-to-br from-[#1a1200] to-[#0F172A] rounded-2xl border border-[#F2994A]/20 shadow-xl p-6 flex flex-col">
+                  <div className="flex items-center gap-2 mb-4">
+                    <div className="w-8 h-8 rounded-lg bg-[#F2994A]/10 border border-[#F2994A]/20 flex items-center justify-center">
+                      <Sprout className="w-4 h-4 text-[#F2994A]" />
+                    </div>
+                    <span className="text-sm font-bold text-white">AI Market Insights</span>
+                    <span className="ml-auto text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 animate-pulse">LIVE</span>
                   </div>
-                  <div>
-                    <p className="text-sm text-slate-400 font-medium">Total Revenue</p>
-                    <h3 className="text-2xl font-bold text-white">₹45,200</h3>
-                  </div>
-                </div>
-                <div className="bg-[#0F172A] p-6 rounded-xl border border-slate-800/50 shadow-sm flex items-center gap-4">
-                  <div className="w-12 h-12 bg-purple-500/10 text-purple-400 rounded-full flex items-center justify-center border border-purple-500/20">
-                    <TrendingUp className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-slate-400 font-medium">Average Order Value</p>
-                    <h3 className="text-2xl font-bold text-white">₹3,200</h3>
+                  <div className="flex-1 space-y-4">
+                    <div className="p-4 bg-[#F2994A]/5 border border-[#F2994A]/15 rounded-xl">
+                      <p className="text-[#F2994A] text-xs font-bold uppercase tracking-wider mb-2">🌾 Wheat Forecast</p>
+                      <p className="text-slate-300 text-sm leading-relaxed">Wheat prices are predicted to <strong className="text-[#F2994A]">rise by 5.2%</strong> next week due to export demand. Consider listing your inventory soon.</p>
+                    </div>
+                    <div className="p-4 bg-blue-500/5 border border-blue-500/15 rounded-xl">
+                      <p className="text-blue-400 text-xs font-bold uppercase tracking-wider mb-2">🌧️ Weather Alert</p>
+                      <p className="text-slate-300 text-sm leading-relaxed">Unseasonal rain expected in 3 days. <strong className="text-blue-400">Harvest perishables</strong> before Tuesday.</p>
+                    </div>
+                    <div className="p-4 bg-emerald-500/5 border border-emerald-500/15 rounded-xl">
+                      <p className="text-emerald-400 text-xs font-bold uppercase tracking-wider mb-2">📈 Top Demand</p>
+                      <p className="text-slate-300 text-sm leading-relaxed">Tomatoes and onions trending <strong className="text-emerald-400">+18% demand</strong> in Delhi NCR this week.</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </>
+
+              {/* Bottom Section: Orders Table + Perishables */}
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-5">
+
+                {/* Recent Orders Table (3/5) */}
+                <div className="lg:col-span-3 bg-[#0F172A]/80 backdrop-blur-sm rounded-2xl border border-slate-800/60 shadow-xl overflow-hidden">
+                  <div className="p-5 border-b border-slate-800/50 flex items-center justify-between">
+                    <h3 className="text-base font-bold text-white">Recent Orders</h3>
+                    <button onClick={() => setActiveTab("orders")} className="text-xs text-[#F2994A] hover:underline font-medium">View All →</button>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b border-slate-800/50 text-[10px] uppercase tracking-wider text-slate-500">
+                          <th className="px-5 py-3 text-left font-bold">Order ID</th>
+                          <th className="px-5 py-3 text-left font-bold">Product</th>
+                          <th className="px-5 py-3 text-left font-bold">Date</th>
+                          <th className="px-5 py-3 text-right font-bold">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {[
+                          { id: "#ORD-4821", product: "Basmati Rice (50kg)", date: "Apr 7, 2026", status: "Shipped", color: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+                          { id: "#ORD-4820", product: "Organic Wheat Flour", date: "Apr 6, 2026", status: "Delivered", color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
+                          { id: "#ORD-4819", product: "Fresh Tomatoes (10kg)", date: "Apr 6, 2026", status: "Pending", color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20" },
+                          { id: "#ORD-4818", product: "Turmeric Powder (2kg)", date: "Apr 5, 2026", status: "Delivered", color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" },
+                          { id: "#ORD-4817", product: "Red Onions (25kg)", date: "Apr 5, 2026", status: "Shipped", color: "bg-blue-500/10 text-blue-400 border-blue-500/20" },
+                        ].map((order) => (
+                          <tr key={order.id} className="border-b border-slate-800/30 hover:bg-white/[0.02] transition-colors">
+                            <td className="px-5 py-3.5 font-mono text-xs text-[#F2994A] font-bold">{order.id}</td>
+                            <td className="px-5 py-3.5 text-slate-300 font-medium">{order.product}</td>
+                            <td className="px-5 py-3.5 text-slate-500 text-xs">{order.date}</td>
+                            <td className="px-5 py-3.5 text-right">
+                              <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${order.color}`}>
+                                {order.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                {/* Perishables Alert (2/5) */}
+                <div className="lg:col-span-2 bg-[#0F172A]/80 backdrop-blur-sm rounded-2xl border border-slate-800/60 shadow-xl p-5">
+                  <div className="flex items-center gap-2 mb-5">
+                    <div className="w-8 h-8 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center">
+                      <AlertTriangle className="w-4 h-4 text-red-400" />
+                    </div>
+                    <div>
+                      <h3 className="text-sm font-bold text-white">Perishables Alert</h3>
+                      <p className="text-slate-500 text-xs">Days until expiry</p>
+                    </div>
+                  </div>
+                  <div className="space-y-5">
+                    {[
+                      { name: "Tomatoes", days: 2, max: 7, color: "bg-red-500", label: "High Alert", labelColor: "text-red-400 bg-red-500/10 border-red-500/20" },
+                      { name: "Spinach Leaves", days: 4, max: 7, color: "bg-yellow-500", label: "Warning", labelColor: "text-yellow-400 bg-yellow-500/10 border-yellow-500/20" },
+                      { name: "Green Mangoes", days: 6, max: 14, color: "bg-emerald-500", label: "Safe", labelColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20" },
+                    ].map((item) => (
+                      <div key={item.name}>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-sm font-medium text-slate-300">{item.name}</span>
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${item.labelColor}`}>{item.label}</span>
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <div className="flex-1 h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all ${item.color}`}
+                              style={{ width: `${(item.days / item.max) * 100}%` }}
+                            />
+                          </div>
+                          <span className="text-xs text-slate-400 font-medium w-16 text-right flex-shrink-0">{item.days} days left</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-6 pt-4 border-t border-slate-800/50">
+                    <p className="text-xs text-slate-500 leading-relaxed">
+                      <span className="text-[#F2994A] font-bold">Tip:</span> List your perishables early for faster sales and less wastage.
+                    </p>
+                  </div>
+                </div>
+
+              </div>
+            </div>
           )}
 
           {activeTab === "marketplace" && (
