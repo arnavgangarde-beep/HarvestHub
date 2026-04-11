@@ -58,6 +58,7 @@ import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import type { User as UserType, Product, CartItem } from "./types";
 import ReactMarkdown from "react-markdown";
+import CommunityDashboard from "./components/CommunityDashboard";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -2097,14 +2098,16 @@ function SellerDashboard({ user, onLogout }: { user: UserType, onLogout: () => v
   };
 
   return (
-    <div className="flex h-screen bg-[#020617] overflow-hidden font-sans text-slate-200">
-      {/* Left Sidebar */}
-      <div className="w-64 bg-[#111827] border-r border-slate-800/50 flex flex-col flex-shrink-0 z-20 shadow-2xl">
-        <div className="p-5 flex items-center justify-center border-b border-slate-800/50">
+    <div className="flex h-screen bg-[#020617] overflow-hidden font-sans text-slate-200" style={{ background: "radial-gradient(ellipse at top right, rgba(245,158,11,0.04) 0%, #020617 50%), radial-gradient(ellipse at bottom left, rgba(20,184,166,0.03) 0%, #020617 60%)" }}>
+      {/* Left Sidebar — Frosted Glass Antigravity */}
+      <div className="w-64 flex flex-col flex-shrink-0 z-20 relative" style={{ background: "rgba(10,18,35,0.75)", backdropFilter: "blur(24px) saturate(150%)", WebkitBackdropFilter: "blur(24px) saturate(150%)", borderRight: "1px solid rgba(255,255,255,0.06)", boxShadow: "4px 0 40px rgba(0,0,0,0.5), inset -1px 0 0 rgba(255,255,255,0.04)" }}>
+        {/* Sidebar ambient glow */}
+        <div style={{ position: "absolute", top: "60%", left: "-30px", width: "160px", height: "160px", background: "radial-gradient(circle, rgba(245,158,11,0.08), transparent)", borderRadius: "50%", pointerEvents: "none", zIndex: 0 }} />
+        <div className="p-5 flex items-center justify-center border-b border-white/5 relative z-10">
           <img src="/harvesthub-logo.png" alt="HarvestHub" className="h-10" />
         </div>
 
-        <div className="flex-1 overflow-y-auto py-6 space-y-1">
+        <div className="flex-1 overflow-y-auto py-6 space-y-1 relative z-10">
           <button
             onClick={() => setActiveTab("dashboard")}
             className={cn("w-full flex items-center gap-3 px-6 py-3 text-sm font-medium transition-colors border-l-2", activeTab === "dashboard" ? "border-[#F59E0B] text-[#F59E0B] bg-white/5" : "border-transparent text-slate-400 hover:text-white hover:bg-white/5")}
@@ -2168,10 +2171,12 @@ function SellerDashboard({ user, onLogout }: { user: UserType, onLogout: () => v
           </button>
           <button
             onClick={() => setActiveTab("community")}
-            className={cn("w-full flex items-center gap-3 px-6 py-3 text-sm font-medium transition-colors border-l-2", activeTab === "community" ? "border-[#F59E0B] text-[#F59E0B] bg-white/5" : "border-transparent text-slate-400 hover:text-white hover:bg-white/5")}
+            className={cn("w-full flex items-center gap-3 px-6 py-3 text-sm font-medium transition-all border-l-2", activeTab === "community" ? "border-[#14b8a6] text-[#14b8a6] bg-white/5" : "border-transparent text-slate-400 hover:text-white hover:bg-white/5")}
+            style={activeTab === "community" ? { boxShadow: "inset 0 0 20px rgba(20,184,166,0.06)" } : {}}
           >
             <Users className="w-4 h-4" />
             Community
+            {activeTab === "community" && <span style={{ marginLeft: "auto", width: "6px", height: "6px", borderRadius: "50%", background: "#14b8a6", boxShadow: "0 0 8px #14b8a6" }} />}
           </button>
           <button
             onClick={() => setActiveTab("orders")}
@@ -2644,11 +2649,7 @@ function SellerDashboard({ user, onLogout }: { user: UserType, onLogout: () => v
           )}
 
           {activeTab === "community" && (
-            <div className="flex flex-col items-center justify-center p-12 text-center h-full">
-              <Users className="w-16 h-16 text-slate-700 mb-4" />
-              <h2 className="text-2xl font-bold text-slate-300 mb-2">Community</h2>
-              <p className="text-slate-500 max-w-md">Connect with fellow farmers, share knowledge, and join discussions in your local agricultural community.</p>
-            </div>
+            <CommunityDashboard userName={user.name} />
           )}
 
           {activeTab === "orders" && (
