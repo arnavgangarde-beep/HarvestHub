@@ -22,6 +22,10 @@
       "destination": "/api/ask.ts"
     },
     {
+      "source": "/api/community-digest",
+      "destination": "/api/community-digest.ts"
+    },
+    {
       "source": "/api/(.*)",
       "destination": "/api/index.ts"
     }

@@ -898,6 +898,55 @@ Use simple, farmer-friendly language. Be specific with quantities (e.g., "10 ml 
     }
   });
 
+  // --- Community Digest (AI Weekly Summary) ---
+  app.post("/api/community-digest", async (req, res) => {
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) return res.status(500).json({ error: "GROQ_API_KEY not configured." });
+
+    const topics: string[] = req.body?.topics ?? [
+      "wheat prices rising due to export demand",
+      "pink bollworm infestation in Vidarbha cotton belt",
+      "unseasonal rainfall warning in AP for paddy",
+      "AI-based irrigation reducing water usage by 40%",
+      "onion price volatility at Nashik mandi",
+    ];
+
+    try {
+      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: "llama-3.3-70b-versatile",
+          messages: [
+            {
+              role: "system",
+              content: `You are HarvestHub's AI community analyst. Given trending topics from an Indian farmer community this week, produce a structured Weekly Digest in JSON. Return ONLY valid JSON with this exact shape:
+{
+  "headline": "string (max 12 words — catchy weekly headline)",
+  "summary": "string (2-3 sentences, max 60 words, India-focused)",
+  "topThreats": [{ "crop": "string", "threat": "string", "severity": "low|medium|high" }],
+  "topOpportunities": ["string", "string", "string"],
+  "weeklyTip": "string (1 concise actionable tip for farmers)"
+}
+Be practical and India-focused.`,
+            },
+            { role: "user", content: `This week's trending community topics: ${topics.join("; ")}` },
+          ],
+          temperature: 0.5,
+          response_format: { type: "json_object" },
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) return res.status(500).json({ error: data?.error?.message || "Groq error" });
+
+      const parsed = JSON.parse(data?.choices?.[0]?.message?.content || "{}");
+      return res.json(parsed);
+    } catch (e: any) {
+      return res.status(500).json({ error: e?.message || "Digest generation failed" });
+    }
+  });
+
   // Vite Middleware (Skip if running on Vercel)
   if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
     // Hide 'vite' from Vercel's Static Analysis (nft) to prevent bundling its native binaries
