@@ -59,6 +59,7 @@ import { twMerge } from "tailwind-merge";
 import type { User as UserType, Product, CartItem } from "./types";
 import ReactMarkdown from "react-markdown";
 import CommunityDashboard from "./components/CommunityDashboard";
+import ZeroGInventory from "./components/ZeroGInventory";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -2567,68 +2568,7 @@ function SellerDashboard({ user, onLogout }: { user: UserType, onLogout: () => v
           )}
 
           {activeTab === "inventory" && (
-            <div className="bg-[#0F172A] border border-slate-800/50 rounded-xl shadow-lg overflow-hidden mt-6">
-              <div className="p-6 border-b border-slate-800/50">
-                <h2 className="text-xl font-bold text-white">Product Inventory</h2>
-                <p className="text-sm text-slate-400">View and track your current stock levels</p>
-              </div>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-sm text-slate-300">
-                  <thead className="text-xs uppercase bg-[#111827] text-slate-400 border-b border-slate-800/50">
-                    <tr>
-                      <th className="px-6 py-4 font-bold tracking-wider">Product Name</th>
-                      <th className="px-6 py-4 font-bold tracking-wider">Category</th>
-                      <th className="px-6 py-4 font-bold tracking-wider">Price</th>
-                      <th className="px-6 py-4 font-bold tracking-wider">Stock Level</th>
-                      <th className="px-6 py-4 font-bold tracking-wider text-right">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {products.map((product) => (
-                      <tr key={product.id} className="border-b border-slate-800/50 hover:bg-[#111827]/50 transition-colors">
-                        <td className="px-6 py-4 font-medium text-white flex items-center gap-3">
-                          <img src={product.image} alt={product.title} className="w-10 h-10 rounded-lg object-cover border border-slate-700" />
-                          {product.title || "Unnamed Product"}
-                        </td>
-                        <td className="px-6 py-4">
-                          <span className="px-3 py-1 bg-slate-800 text-slate-300 rounded-full text-xs font-semibold">{product.category || "Uncategorized"}</span>
-                        </td>
-                        <td className="px-6 py-4 font-medium">₹{typeof product.price === 'number' ? product.price.toLocaleString() : "0"}</td>
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-white">{product.stock}</span>
-                            <span className="text-slate-500 text-xs">units</span>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {product.stock > 10 ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-[#F59E0B]/10 text-[#F59E0B] border border-[#F59E0B]/20">
-                              <div className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]"></div> In Stock
-                            </span>
-                          ) : product.stock > 0 ? (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-yellow-500/10 text-yellow-500 border border-yellow-500/20">
-                              <div className="w-1.5 h-1.5 rounded-full bg-yellow-500"></div> Low Stock
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-red-500/10 text-red-500 border border-red-500/20">
-                              <div className="w-1.5 h-1.5 rounded-full bg-red-500"></div> Out of Stock
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                    {products.length === 0 && (
-                      <tr>
-                        <td colSpan={5} className="px-6 py-12 text-center text-slate-500">
-                          <Package className="w-8 h-8 mx-auto mb-3 opacity-50" />
-                          <p>No products in inventory yet.</p>
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </div>
+            <ZeroGInventory products={products} />
           )}
 
           {/* Placeholders for new tabs */}
