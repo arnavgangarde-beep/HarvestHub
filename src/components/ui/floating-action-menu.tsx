@@ -19,7 +19,7 @@ const FloatingActionMenu = ({ options, className }: FloatingActionMenuProps) => 
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className={cn("fixed bottom-8 right-8 z-50", className)}>
+    <div className={cn("fixed bottom-24 right-6 z-50", className)}>
       {/* Toggle button */}
       <Button
         onClick={() => setIsOpen(v => !v)}
