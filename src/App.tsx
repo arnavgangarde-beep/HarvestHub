@@ -52,7 +52,8 @@ import {
   AlertTriangle,
   Shield,
   Calendar,
-  Stethoscope
+  Stethoscope,
+  Zap
 } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -61,6 +62,7 @@ import ReactMarkdown from "react-markdown";
 import CommunityDashboard from "./components/CommunityDashboard";
 import ZeroGInventory from "./components/ZeroGInventory";
 import AnimatedTextCycle from "./components/ui/animated-text-cycle";
+import FloatingActionMenu from "./components/ui/floating-action-menu";
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -3799,6 +3801,37 @@ export default function App() {
         onComplete={() => { setIsCheckoutOpen(false); setCart([]); }}
         cart={cart}
         user={user}
+      />
+
+      {/* Global Floating Action Menu */}
+      <FloatingActionMenu
+        options={[
+          {
+            label: "Add Product",
+            Icon: <Plus className="w-4 h-4 text-[#F59E0B]" />,
+            onClick: () => { setActiveTab("marketplace"); setIsAdding(true); },
+          },
+          {
+            label: "Ask an Expert",
+            Icon: <Stethoscope className="w-4 h-4 text-teal-400" />,
+            onClick: () => setActiveTab("community"),
+          },
+          {
+            label: "Zero-G Flash Sale",
+            Icon: <Zap className="w-4 h-4 text-orange-400" />,
+            onClick: () => setActiveTab("inventory"),
+          },
+          {
+            label: "Price Prediction",
+            Icon: <TrendingUp className="w-4 h-4 text-blue-400" />,
+            onClick: () => setActiveTab("price_prediction"),
+          },
+          {
+            label: "Community",
+            Icon: <Users className="w-4 h-4 text-purple-400" />,
+            onClick: () => setActiveTab("community"),
+          },
+        ]}
       />
     </div>
   );
