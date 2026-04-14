@@ -3179,6 +3179,32 @@ function ConsumerStorefront({
           )}
         </div>
       </div>
+
+      {/* Customer Quick-Nav FAB */}
+      <FloatingActionMenu
+        options={[
+          {
+            label: "Marketplace",
+            Icon: <ShoppingCart className="w-4 h-4 text-[#F59E0B]" />,
+            onClick: () => setActiveTab("marketplace"),
+          },
+          {
+            label: "My Orders",
+            Icon: <ClipboardList className="w-4 h-4 text-teal-400" />,
+            onClick: () => setActiveTab("orders"),
+          },
+          {
+            label: "My Profile",
+            Icon: <User className="w-4 h-4 text-blue-400" />,
+            onClick: () => setActiveTab("profile"),
+          },
+          {
+            label: "Settings",
+            Icon: <Settings className="w-4 h-4 text-purple-400" />,
+            onClick: () => setActiveTab("settings"),
+          },
+        ]}
+      />
     </div>
   );
 }
@@ -3803,36 +3829,6 @@ export default function App() {
         user={user}
       />
 
-      {/* Global Floating Action Menu */}
-      <FloatingActionMenu
-        options={[
-          {
-            label: "Add Product",
-            Icon: <Plus className="w-4 h-4 text-[#F59E0B]" />,
-            onClick: () => { setActiveTab("marketplace"); setIsAdding(true); },
-          },
-          {
-            label: "Ask an Expert",
-            Icon: <Stethoscope className="w-4 h-4 text-teal-400" />,
-            onClick: () => setActiveTab("community"),
-          },
-          {
-            label: "Zero-G Flash Sale",
-            Icon: <Zap className="w-4 h-4 text-orange-400" />,
-            onClick: () => setActiveTab("inventory"),
-          },
-          {
-            label: "Price Prediction",
-            Icon: <TrendingUp className="w-4 h-4 text-blue-400" />,
-            onClick: () => setActiveTab("price_prediction"),
-          },
-          {
-            label: "Community",
-            Icon: <Users className="w-4 h-4 text-purple-400" />,
-            onClick: () => setActiveTab("community"),
-          },
-        ]}
-      />
     </div>
   );
 }
