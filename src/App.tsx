@@ -61,6 +61,7 @@ import type { User as UserType, Product, CartItem } from "./types";
 import ReactMarkdown from "react-markdown";
 import CommunityDashboard from "./components/CommunityDashboard";
 import ZeroGInventory from "./components/ZeroGInventory";
+import SoilAnalyst from "./components/SoilAnalyst";
 import AnimatedTextCycle from "./components/ui/animated-text-cycle";
 import FloatingActionMenu from "./components/ui/floating-action-menu";
 
@@ -2223,6 +2224,15 @@ function SellerDashboard({ user, onLogout }: { user: UserType, onLogout: () => v
             <Bug className="w-4 h-4" />
             Disease Diagnosis
           </button>
+          <button
+            onClick={() => setActiveTab("soil_analyst")}
+            className={cn("w-full flex items-center gap-3 px-6 py-3 text-sm font-medium transition-all border-l-2", activeTab === "soil_analyst" ? "border-emerald-400 text-emerald-400 bg-white/5" : "border-transparent text-slate-400 hover:text-white hover:bg-white/5")}
+            style={activeTab === "soil_analyst" ? { boxShadow: "inset 0 0 20px rgba(52,211,153,0.06)" } : {}}
+          >
+            <Leaf className="w-4 h-4" />
+            Soil Analyst
+            {activeTab === "soil_analyst" && <span style={{ marginLeft: "auto", width: "6px", height: "6px", borderRadius: "50%", background: "#34d399", boxShadow: "0 0 8px #34d399" }} />}
+          </button>
 
           {/* Platform Group */}
           <div className="px-4 mt-6 mb-2 flex items-center justify-between">
@@ -2659,6 +2669,10 @@ function SellerDashboard({ user, onLogout }: { user: UserType, onLogout: () => v
 
           {activeTab === "disease_diagnosis" && (
             <CropDiseaseDiagnosis />
+          )}
+
+          {activeTab === "soil_analyst" && (
+            <SoilAnalyst />
           )}
 
           {activeTab === "community" && (
